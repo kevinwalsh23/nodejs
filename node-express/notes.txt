@@ -1,0 +1,162 @@
+Rest: Representational State Transfer
+
+Web Services:
+-system designed to support interoperability of systems connected over a network
+-service oriented arcirtecture (SOA)
+-standardized way of integrating web based apps using open standards operating over the internet
+
+Two common approaches:
+SOAP (Simple Object Access Protocol
+-uses WSDL (Web Services Description Lang)
+-XML based
+
+REST
+-use web standards
+-exchange of data using XML or JSON
+-simpler compared to SOAP, WDSL etc
+
+Server supports rest api, client can invoke api endpoint
+
+REST
+style of software architecture for distrubited hypermedia such as WWW
+introducted in dissertation
+collection of network architecture principles outline how resources are defined and addressed
+Four basic principles:
+-use http methods explicitely
+-be stateless
+-expose directory structure like URIs
+-transfer using XML, JSON, or both
+
+Motivation for REST was to capture characteristics of Web that made web successful
+-URI UNiform Resource Indicator Addressable resources
+-HTTP Protocol
+-Make request, receive response, display response
+ Expoits use of HTTP protocol beyond POST AND GET 
+-HTTP PUT, DELETE
+-preserve idempotence
+
+Nouns > resources
+Verbs > actions
+Representations > XML, JSON
+
+Resources:
+key abstraction of information REST is resources (specified by URL)
+resource is conceptual mapping to a set of entities
+directory structure
+
+Verbs: actions to be performed on resources
+GET > READ
+POST > CREATE
+PUT > UPDATE
+DELETE > DELETE
+
+Express Router
+Express Application Routes
+-identify endpoint with a URI
+-apply the verb on the URI
+-Express supports this through app.all, app.get, app.post, app.put, app.delete methods
+Application Routes:
+-app.all('dishes', function(req, res, next){})
+-specifies what needs to be done on these type of requests
+Routes with Parameters
+-Example: app.get('dishes.:dishId', (req, res, next) => {
+    res.end('Will send details of your dish:' + req.params.dishId+ 'to you!')
+})
+
+-use req.params.{param_you_choose}
+
+Body Parser
+-data enclosed in body of message
+-need to exttract info from body of message
+-middleware to parse body of message
+Using Body Parser:
+var bodyParser = require(body-parser)
+app.use(bodyParser.json()); //parse the Json in the body
+Parses the body of the message and populates the req.body property
+
+Multiple Endpoints
+-subdivied into multiple modules
+Express Router creates mini Express Application
+var dishRouter = express.Router();
+dishRouter.use(bodyParser.json());
+
+dishRouter.route('/')
+    .all(...);
+    .get(...);
+
+Exercise: Express Router
+npm install body-parser@1.18.3 --save
+index.js > const bodyParser = require('body-parser');
+appuse(bodyParnser.json)
+//use app.use when wanting to include middleware
+
+build /dishes endpoint
+app.all('/dishes', (req, res, next) => {
+    //handle incoming requests
+    //all means no matter what method, this code executed first
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/plain')
+    next();
+    //next means it continues on looking for additional specs matching endpoint
+})
+
+app.get('/dishes, (req, res, next) => {
+    res.end('Will send dishes to you')
+});
+
+app.post(/dishes, (req, res, next) => {
+    res.end('Will send dishes to you' + req.body.name + req.body.description)
+});
+
+app.put(/dishes, (req, res, next) => {
+    res.statusCode = 403; //operation not supported
+    res.end('Put operation not supported on /dishes endpoint');
+});
+
+app.delete('/dishes, (req, res, next) => {
+    res.end('Deleting all the dishes to you')
+});
+
+app.get('/dishes/:dishId, (req, res, next) => {
+    res.end('Will send details of the dish: ' + req.params.dishId)
+});
+
+app.post(/dishes/:dishId, (req, res, next) => {
+    res.statusCode = 403; //operation not supported
+    res.end('Put operation not supported on /dishes endpoint');
+});
+
+app.put(/dishes/:dishId, (req, res, next) => {
+    res.write('Updating the dish: ' + req.params.dishId)
+    res.end('Will update the dish '+ req.params.dishId);
+});
+
+app.delete('/dishes/:dishId, (req, res, next) => {
+    res.end('Deleting the dish '+ req.params.dishId + 'for you.')
+});
+
+Can subdivide into mini express apps, and can use express router to constuct mini express app
+in express router, we support api for one group (like above)
+
+Create new folder, and new file called dishRouter.js
+handles rest api endpoint for /dishes and /dishes/:dishId
+
+const express = require('express');
+still require express in dishRouter file, once you define new file it becomes its own module
+const bodyParser = require(body-parser);
+
+const dishRouter = express.Router();
+//declares dishRouter as express router
+
+//takes endpoint as params
+//declaring endpoint as one single location where you can chain all methods
+//becomes one group of method implementations
+dishRouter.route('/);
+need to mount within index.js file
+mount at /dishes endpoint
+
+module.exports = dishRouter;
+
+const dishRouter = require('./routes/dishRouter')
+
+
