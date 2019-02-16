@@ -151,7 +151,7 @@ const dishRouter = express.Router();
 //takes endpoint as params
 //declaring endpoint as one single location where you can chain all methods
 //becomes one group of method implementations
-dishRouter.route('/);
+dishRouter.route('/');
 need to mount within index.js file
 mount at /dishes endpoint
 
@@ -159,4 +159,169 @@ module.exports = dishRouter;
 
 const dishRouter = require('./routes/dishRouter')
 
+app.use('.dishes', dishRouter)
 
+app.all('/dishes', (req,res,next) => {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/plain');
+    next();
+  });
+  
+  app.get('/dishes', (req,res,next) => {
+      res.end('Will send all the dishes to you!');
+  });
+  
+  app.post('/dishes', (req, res, next) => {
+   res.end('Will add the dish: ' + req.body.name + ' with details: ' + req.body.description);
+  });
+  
+  app.put('/dishes', (req, res, next) => {
+    res.statusCode = 403;
+    res.end('PUT operation not supported on /dishes');
+  });
+   
+  app.delete('/dishes', (req, res, next) => {
+      res.end('Deleting all dishes');
+  });
+  
+  app.get('/dishes/:dishId', (req,res,next) => {
+      res.end('Will send details of the dish: ' + req.params.dishId +' to you!');
+  });
+  
+  app.post('/dishes/:dishId', (req, res, next) => {
+    res.statusCode = 403;
+    res.end('POST operation not supported on /dishes/'+ req.params.dishId);
+  });
+  
+  app.put('/dishes/:dishId', (req, res, next) => {
+    res.write('Updating the dish: ' + req.params.dishId + '\n');
+    res.end('Will update the dish: ' + req.body.name + 
+          ' with details: ' + req.body.description);
+  });
+  
+  app.delete('/dishes/:dishId', (req, res, next) => {
+      res.end('Deleting dish: ' + req.params.dishId);
+  });
+
+  Assignment 1
+  (:dishId will be in same file as dishes)
+  1. Update dishrouter.js to implement API support for /:dishId
+  2. Implement promoRouter.js implements router for promotions and :promoId
+  3. Implement leaderRouter.js that implements router for leaders and :leadersId
+
+  Express Generator
+  automatically scaffolds express framework
+  command line interface CLI
+  -quick scaffolding tool to generate an Express app skeleton
+  -standard middleware included
+  -install: npm install express-generator -g
+Generating an Express Application
+express <App Name>
+Generates a folder under the current folder with the nme pp name
+various options available
+Then move to the folder and install the node modules: npm install
+
+Generated Application
+app.js: starting Application
+package.json
+public: static resources
+routes: Application routes
+views: template engine for standard html templates
+
+npm install -g express-generator@4.16.0
+move to NodeJs folder > express conFusionServer
+move into folder > npm install to install all modules
+
+Intro to MongoDB
+SQL: structured query language, relational database
+NoSQL Databases
+1. Document databases (Mongo)
+2. Key Value (redis)
+3. Column-family databases (Cassandra)
+4. Graph databases (Neo4J)
+
+Document Databases
+-Document: self contained piece of info
+-e.g. JSON
+Collection: collection of documents
+Database: set of collections
+
+Why NoSQL
+1. Scalability
+-availability
+-consistency
+-partition tolerance
+2. Ease of Deployment
+-no object relation mapping required
+
+MongoDB
+Document Database
+-Server can support multiple databases
+-database is set of collections
+-collection is set of documents
+-Document is effectively a JSON doc with additional features
+Mongo stores docs in BSON (Binary JSON) format
+-Supports length prefix on each value (easy to skip over a field)
+-Info about the type of field value
+-Additional primitives types not supported by raw json like UTC date time, raw binary, and ObjectId
+
+MongoDB ObjectId
+Every document in Mongo must have an "_id" field that is unique
+Default ObjectId created by Mongo when you insert a document
+OnjectId is 12 byte field: Timestamp (4), Machine ID (3), Proc ID (2), Increment (3)
+id.getTimestamp returns timestamp in ISO Date format
+
+Mongo Troubleshooting
+How do I ensure that Mongo binaries are in my PATH - in my shell' rc (~/.bashrc) on a Mac
+sudo cp mongodb-osx-x86_64-2.6.7/bin/* /usr/local/bin/
+
+Mongod complains that there is no /data/db folder
+sudo chown -R $USER /data/db (at home terminal)
+
+unable to start mongodb local server
+Use sudo killall -15 mongod instead
+
+Node and MongoDB
+How to access Mongo with Node app
+NodeJS driver officially avail from Mongo devs
+
+Node MongoDB driver
+provides high level API to interact with Mongo server
+Installation: npm install mongodb --save
+
+Node mongoDB river support several operations tyhat can be performed:
+-connect to mongodb
+-insert, delete, update, query records
+Supports callback and promise based interactions
+
+Create index.js (app that interacts with Mongodb server)
+
+const MongoClient = require('mongodb').MongoClient;
+const assert = require('assert');
+
+const url = 'mongodb://localhost:27017/';
+//port where mongo server is running
+const dbname = 'conFusion';
+
+MongoClientconnect(url, (err, client) => {
+    assert.equal(err, null);
+
+    console.log('Connected to Server');
+
+    const db = client.db(dbname);
+    //connect to database
+
+    const collection = db.collection('dishes');
+
+    collection.insertOne({ "name": "Thing", "description": "fun database stuff!"}, (err, result) => {
+        assert.equal(err, null);
+        console.log("After Insert:\n")
+        console.log(result.ops)
+        collection.find({}).toArray((err, docs) => {
+            assert.equal(err, null);
+            console.log(docs);
+            
+        })
+    })
+
+});
