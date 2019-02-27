@@ -1,0 +1,165 @@
+Node and MongoDB Part 2
+
+Interacting with the server with our node application
+operations.js (four operations)
+const assert = require('assert');
+exports.insertDocument = (db, document, collection, callback) => {
+    //function thats exported by node module
+    const coll = db.collection(collection);
+    coll.insert(document, (err, result) => {
+        assert.equal(err, null);
+        console.log("Inserted " + result.result.n + " documents into the collection " + collection);
+        callback(result);
+    })
+
+}
+
+exports.findDocuments = (db, collection, callback) => {
+    //function thats exported by node module
+    const coll = db.collection(collection);
+    //perform operations on collection
+    coll.find({}).toArray((err, docs) => {
+
+    })
+
+}
+
+exports.removeDocument = (db, document, collection, callback) => {
+    //function thats exported by node module
+    const coll = db.collection(collection);
+}
+
+exports.updateDocument = (db, document, update, collection, callback) => {
+    //function thats exported by node module
+    const coll = db.collection(collection);
+    coll.updateOne()
+}
+
+Callback Hell and Promises
+Subsequent function included in callback function > leads to pyramid like structure in your code
+Rearrange code with promises to mitigate
+
+Callback Hell
+-heavily nested callback code
+-results from tendancy to write programs top down
+-declare functions with names
+-Can use promises to tame it 
+-tries to preserve top down appearance of code
+Promise
+-mechanism that supports async computation
+-proxy for a value not necessarily known when promise created: represents placeholder for the value
+-value available now, in future, or never
+
+Pending promise > resolves/fulfilled or rejected > need to handle both
+new Promise ( function (resolve, reject) { ...});
+resolve > .then
+
+Promise solves callback hell problem
+promises can be chained
+Can immediately return:
+promise.resolve(result)
+promise.reject(error)
+
+Consuming Promises
+-Consumers of promise are notified of fullfillment or rejection of promise
+register callbacks to handle fullfillment with .them() and .catch()
+
+promise
+    .then(())
+    .catch(())
+
+Using Promises
+-transform with promise code already provided with mongodb driver
+
+update operations.js
+
+Mongoose ODM
+MongoDB Driver > lets node app to communicate with mongo server, store and retrive docs from server
+provides with methods to make collections in db, add docs, perform operations
+
+Mongoose ODM node module enables to define schemas and structures
+strictly enforces structure
+
+Mongo stores data in form of documents (inside of collections)
+No structure imposed on docs
+-any doc can be stored in any collection
+-relies on dev to maintain structure of docs
+
+Mongoose ODM
+-object data model 
+-object document mapping
+-object relational mapping
+
+Adds structure to MongoDB through schema
+
+Mongoose schema
+-structure of data to be stored
+-defines all fields in documents and their types
+-can do validation
+Schema types: string, number, date, buffer, boolean, mixed, objectId, array 
+Schema is used to create a model function (enables defining structure)
+Schemas can be nested to enable supported embedded or subdocuments
+
+Define schemas in Mongoose
+const Schema = mongoose.schema;
+
+const commentSchema = new Schema ({
+    rating:  {
+        type: Number,
+        min: 1,
+        max: 5,
+        required: true
+    }
+})
+
+Can do nested schemas, establish then use inside another
+
+const dishSchema = new Schema ({
+    comments: [commentSchema]
+})
+
+var Dishes = mongoose.model('Dish', dishschema);
+
+module.export = Dishes;
+
+Mongoose has own methods
+
+Mongoose ODM Part 1
+Mongoose brings schemas to structure the docs in our db
+mongoose make use of node module and incorporate in app
+use mongoose to communicate with server
+
+install mongoose
+new folder > node-mongoose
+package.json > start script > node index.js
+
+terminal > npm install mongoose@5.1.7 --save
+
+create subfolder called models
+
+new file dishes.js
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema;
+
+const dishSchema = new Schema({
+    name: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    description: {
+        type: String,
+        required: true
+    }
+},{
+    timestamps: true
+});
+
+var Dishes = mongoose.model('Dish', dishSchema);
+
+module.exports = Dishes;
+
+
+    
+})
+
