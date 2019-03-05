@@ -1,0 +1,14 @@
+REST API with Express, Mongo, and Mongoose
+
+Full fledged REST API Server (using express)
+
+Get request to server from client > Express Server business logic knows it needs to send query to database
+data transformed in reply message and sent back to server
+data sent back to client
+
+HTTP Request to Database Operation Mapping
+-every incoming request needs to be decoded to decide the nature of the request
+-GET, PUT, POST, DELETE
+-Resource affected
+-data in body or request
+Translate request to equivalent database Operation
