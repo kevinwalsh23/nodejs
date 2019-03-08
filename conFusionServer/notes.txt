@@ -1,0 +1,77 @@
+Basic Authentication
+HTTP Basic Authentication
+-Method for HTTP user agent to provide username and password with a request
+-Server can challenge client to authenticate itself
+-client needs to send username and password in response
+
+Authorization Header
+1. Username and password are combined into string username:password
+2. Resulting string literal is then encoded using Base64
+3. Authorization method and a space, i.e. "basic" is then put before the encoded string
+
+Authorization: Basic QWxhZGTKKNDUN32mS
+
+Express and Authentication
+-middleware applied to request and response
+(req, res, next)
+
+Basic Authentication
+-add to confusion Server
+
+Cookies, Tea, and Express Session
+-store info on client side thats included in each request
+-include basic info in outgoing request from client
+
+HTTP Cookies
+-small pieceof data sent from web server and stored on client side
+-each subsequent request from client side should include the cookie in the request
+-Client sends request to server, server responds with cookie, with header set-cookie: xxx
+-each subsequent request from client side with include header field cookie with cookie value
+-cookies can have expiration date
+
+Express and Cookies
+-Server can set a cookie as follows in any of the middleware: res.cookie(name, value, options)
+-app.use(cookieParser());
+CookieParser parses incoming cookies and attaches them to the request
+-req.cookies.name
+Express and Signed Cookies
+-Signed cookie: signed with a secret key on the server side
+-digital signature with key-hash messages authentication code (verifiable)
+-Cookie parser supports signed cookies
+var cookieParser = require('cookie-parser');
+app.use(cookieParser('secret key'))
+Parsed signed cookies made available as:
+req.signedCookies.name
+
+Express Sessions
+-Used to track user Sessions
+--Combination of cookie with session id and server side storage information indexed by session id
+--session info:
+---Stored by defauly in memory (wiped out when server restarts)
+---stored in peranent store on server side
+---distributed session store if using multiple replicated servers
+
+Express-session middleware
+var session = require('expess-session);
+var Filestore = require('session-file-store')(session);
+
+app.use(session({
+    name: 'session-id',
+    secret: '12345',
+    saveUtinitialized: false,
+    resave: false,
+    store: new FileStore()
+}))
+
+Expression session information available as: req.session
+
+Expression Session
+Properties:
+-cookie: toptions object for session ID cookie. default value is { path : '/', httpOnly:true, secure: false, maxAge: null}
+-genId: function to generate the session ID. Defauly is to use UUID
+-resave: if true, forces a session to be saved back to store even if not midified in request
+-saveUtinitialized: if true, forces newly created session without any modifiations to be saved in session store
+-secret: key for signed cookies
+-store: session store instance, default is in memory
+
+Exercise: Using Cookies
