@@ -6,7 +6,8 @@ var logger = require('morgan');
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
 var passport = require('passport');
-var authenticate = require('./authenticate')
+var authenticate = require('./authenticate');
+var config = require('./config');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -19,7 +20,7 @@ const mongoose = require('mongoose');
 const Dishes = require('./models/dishes');
 
 //establish server location
-const url = 'mongodb://localhost:27017/conFusion';
+const url = config.mongoUrl;
 
 //create connection
 const connect = mongoose.connect(url);
@@ -42,35 +43,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 //app.use(cookieParser('12345-67890-09876-54321'));
 
-app.use(session({
-  name: 'session-id',
-  secret: '12345-67890-09876-54321',
-  saveUninitialized: false,
-  resave: false,
-  store: new FileStore()
-}));
+
 //if user is logged in,
-app.use(passport/initialize);
-app.use(passport.session());
+app.use(passport.initialize());
 
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-
-function auth (req, res, next) {
-  console.log(req.session);
-
-if(!req.user) {
-    var err = new Error('You are not authenticated!');
-    err.status = 403;
-    return next(err);
-}
-else {
-    next();
-  }
-}
-//add authentication (create function to authenticate the user)
-app.use(auth);
 
 app.use(express.static(path.join(__dirname, 'public')));
 

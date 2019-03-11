@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/kevinwalsh23/nodejs#readme",
   "dependencies": {
-    "assert": "^1.4.1"
+    "assert": "^1.4.1",
+    "jsonwebtoken": "^8.3.0",
+    "passport-jwt": "^4.0.0"
   }
 }
