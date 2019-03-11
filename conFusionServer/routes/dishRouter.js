@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const authenticate = require('../authenticate');
+var authenticate = require('../authenticate');
 
 const Dishes = require('../models/dishes');
 
