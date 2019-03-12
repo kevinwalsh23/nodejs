@@ -45,9 +45,9 @@ dishRouter.route('/')
 });
 
 dishRouter.route('/:dishId')
-.populate('comments.author')
 .get((req,res,next) => {
     Dishes.findById(req.params.dishId)
+    .populate('comments.author')
     .then((dish) => {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
