@@ -75,3 +75,256 @@ Properties:
 -store: session store instance, default is in memory
 
 Exercise: Using Cookies
+Passport - node module making authentication easy
+-authentication middleware
+-3P, O-Auth, etc.
+
+-authentication middleware for node.js
+-modular, flexible
+-supports various strategies
+-local stategy(registering users in your system)
+-openID
+-Oauth (Facebook, Twitter, G+, etc.)
+-Token based authentication(Json)
+-Supports sessions (optimal, easy way to track users on server side)
+-npm install passport --save
+
+app.post('/login', passport.authenticate('local'),
+(req, res) => {
+    //if this function gets called, auth successful
+    //req.user contains authenticated user
+    res.redirect('/users' + req.user.username)
+});
+
+Passport-local
+-passport strategy for authenticating a userwith a user name and password
+-npm install passport-local --save
+-specify local strategy and how it is Used
+
+passport.use(new LocalStrategy( function (username, password,done){
+
+}))
+
+Passport-Local-Mongoose
+-mongoose plugin to simplify building username and password login
+-npm install passport-local-mongoose --save
+-makes available mongoose schema support for managing users
+-adds usernames, hash and salt field to store the username, the hashed password and salt value
+-additional methods to user schema to support passport local authentication
+
+user.plugin*(passportLocalMongoose);
+//auto adds user field and hashed password storage field
+
+//requires model with passport-local mongoose  plugin
+var User = require('/.models/user)
+
+//user static authenticate method of model in LocalStrategy
+passport.use(new LovalStrategy(User.authenticate()))
+
+//use static serialize and deserialize of model for passport session support
+-passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserialize());
+
+Token Based Authentication
+-Cookie and session not scalable
+
+Cookies + Session Auth
+-cookies set on client side by the server
+-cookies use as a storage for the session ID that is used as an index into server-side storage of session info
+-not scalable, servers need to keep tracks of thousands or millions of sessions
+
+Why Token Based Auth?
+-session authentication becomes problem when we need stateless servers and scalability
+-mobile apps have hard time handling cookies + sessions
+-sharing authentication with other apps not feasible
+-Server issues token to validated user and subsequent requests from client side will include token (in header or body)
+-helps with cross origin resource sharing problems (CORS)
+-Cross site request forgery
+-makes easy to share info across applications
+
+1. User requests access with username and password (validation in any manner)
+2. Server validates credentials
+3. Server creates signed token and sends it to the client (nothing stored on server)
+4. All subsequent requests from client should include the token
+5. Server verifies the token and responds with data if validated
+
+JSON Web Tokens (JWT)
+-standards based (IETF RFC 7519*)
+-self contained (carryall info necessary within itself)
+-shareable (can share with other applications to act on your behalf)
+
+IETF (Internet Engineering Task Force)
+Request for Comments (RFC)
+
+Header (algorithm & token type)
+{
+    'alg': "HS256",
+    'typ': "JWT"
+}
+
+Payload (data) (helps identify the user)
+
+{
+    "_id": "asdfasdfadf",
+    "iat": 123123123,
+    "exp": 123123123
+}
+
+Signature
+HMACSHA256(
+    base64UrlEncode(header) + "." +
+    base64UrlEncode(payload),
+    secret
+)
+
+jsonwebtoken Node module
+npm install jsonwebtoken --save
+provides several methods:
+-=sign() for signing and issueing Tokens-verify() for verifying and decoding token and make available on the request prop in Express
+
+Passport-JWT
+0passport strategy for authenticaty JWT
+-authenticate RestFUl endpoints using JWT without needing server sessions
+npm install passport0jwt --save
+create and configure anew passport strategy based on JWT authentication
+Extracting the JWT from an incoming request (heae, body, url query pars. etc)
+
+Mongoose Population
+MongoDB and Relations
+-everything stored in doc is completly in doc
+-NoSQL databses like MongoDB normally do not explicitely support relations like the SQL databases
+-All documents are expected to be self contained
+-You can store references to other documents within a document by using ObjectIds
+-Mongoose does not have joins
+
+Referencing Documents Examples
+-Consider the dishes documents that used in the Exercise
+--comments are posted by users
+--we already have a user document containing users info
+--referencing user document within comment sub document using ObjectIds
+
+Modified Comment schema
+author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+}
+
+Mongoose Population
+-population is progress of automatically replacing specified paths within a document with documents from another collection
+-cross refence with ObjectIds helps
+
+Populating the documents
+Dishes.find({})
+.populate('comments.author')
+
+Get operations by anyone
+Post, Put, Delete only by admin users
+req.user see if admin flag is true or not
+
+HTTPS and Secure Communication
+Symmetric Key Cryptography
+-Symmetric Encryption: shared secret between two parties
+Sender: Message > Secret Key > Encrypted Message > Reciever: Secret Key > Message
+
+Assymetric Encryption:
+-Public key that can be widely distributed
+-Private key that is only known to Reciever
+
+Sender: Message > public key > Encrypted message > Reciever > private key > message
+Secure Sockets Layer (SSL)/ Transport Layer Security (TSL)
+-Cryptograpphic protocols that ensure secure communication over an insecure network like the Internet
+-Privacy and Integrity of communication protected
+-uses combination of public key Cryptography and Symmetric Cryptography
+
+
+Generating Keys
+openssl for generating keys for testing
+
+Node HTTPS module
+HTTPS core module
+var https = require('https');
+
+var options = {
+    key: fs.readFileSync(_dirname+'/private.key')
+}
+
+Uploading Files
+-typically supported through form input
+<input type='file' name='image'>
+Form encoded as:
+-application/x-www-form-urlencoded
+-multipart/form data
+-applied to form elements enctype attribute
+<form action='imageUpload' method='post' enctype='multipart/form-data'>
+-File upload more efficient with multipart/form-data
+-HTML5
+ -multipart/form data when included will have request header as:
+ --'content-type: 'multipart.formdata; boundary=----12312123123'
+ -boundary separates multipart request body
+
+NPM module Multer (supports multipart)
+node middleware for handling multipart/form-data
+-written on top of busboy, a node module for parsing incoming html form data
+-pareses incoming form data and adds body object and file/files object to request object
+
+Cross Origin Resource Sharing (CORS)
+
+Same Origin Policy
+-web app security model that restricts how a document or script loaded from one origin can interact with a resource from another origin
+-isolating potentially malicious documents
+-Origin defined by three tuple: (protocol (http v https), host name, port numner)
+
+Cross Origin Requests
+-cross origin HTTP request: accessing a resource from a different domain, protocol, or port
+-Browsers restrict cross origin HTTP requests initiated within scripts eg XMLHttpRequest or FETCH
+
+CORS
+-mechanism to give web servers cross domain access controls
+-browser and server can interact to determine whether or not it is safe to allow the cross0origin request
+-new set of HTTp headers that allow servers to describe the set of origins that are permitted to read the informatio using a web browser
+-access-control-access-allow
+-access-control-allow-credentials
+0access control allow headers etc
+Simple cross site requests
+-GEt or POST with request body containing application/x-www/form0urlencoded
+-no custom headers
+-for widely accessed resources Like get, can send back reply with access-control-allow-origin: *header
+-if need to restrict access, then send reply with access-control,allow-origin: http://abc.com
+
+Preflighted Requests
+-Methods that can cause side-effects on servers data: non GET or POST, or even POST with content0-type other than mentioned earlier
+-Mandated to "preflight" the request by soliciting the server's supported methods by sending a HTTP OPTIONS request methods
+-Then upon "approval" from the server sending the actual request
+-Server response may include access-control-allow-methods, access-control-allow-headers, access-control-allow-credentials
+
+Credentialed Requests
+-requests that accompanied by Cookies or HTTP Authentication information
+-Server needs to respond with Access-Control-Allow-credentials
+-Access-Control-allow-Origin header cannot ahve a wildcard value, must mention a valid origin domain
+
+CORS NodeModule
+-Middleware to configure CORS with various options
+-npm install cors --save
+-Simple CORS enabling all CORS requests
+-Enabling CORS for specific routes
+-Configuration optinos for various headers
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
